@@ -2,53 +2,31 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Queue</title>
+<title>Test Queue</title>
 </head>
 
 <body style="text-align:center;margin-top:100px">
 
-<h2>🔔 Đang phục vụ</h2>
-<div id="current" style="font-size:50px;color:red">---</div>
+<h2>TEST BUTTON</h2>
 
-<br><br>
+<button onclick="getNumber()" style="font-size:25px">
+Lấy số
+</button>
 
-<button onclick="getNumber()" style="font-size:25px">Lấy số</button>
 <h3 id="your">---</h3>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyD6vL7Nr8XhmCbX700FWcryO9wvoEfL3K8",
-  authDomain: "long-64d26.firebaseapp.com",
-  databaseURL: "https://long-64d26-default-rtdb.firebaseio.com"
-};
+let num = 0;
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-/* Hiện số đang phục vụ */
-db.ref("current").on("value", snap => {
-  document.getElementById("current").innerText = snap.val() ?? "---";
-});
-
-/* Lấy số (BẢN ĐƠN GIẢN) */
 function getNumber() {
-  const ref = db.ref("queue");
+  num = num + 1;
 
-  ref.once("value").then(snap => {
-    let current = snap.val() || 0;
-    let newNumber = current + 1;
+  alert("CLICK OK - số = " + num);
 
-    ref.set(newNumber);
+  document.getElementById("your").innerText =
+    "Số của bạn: " + num;
 
-    document.getElementById("your").innerText =
-      "Số của bạn: " + newNumber;
-  }).catch(err => {
-    console.log(err);
-    alert("Lỗi Firebase");
-  });
+  console.log("clicked", num);
 }
 </script>
 
