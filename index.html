@@ -28,16 +28,25 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+/* Hiển thị số đang phục vụ realtime */
 db.ref("current").on("value", snap => {
-  document.getElementById("current").innerText = snap.val() || "---";
+  document.getElementById("current").innerText = snap.val() ?? "---";
 });
 
+/* Lấy số */
 function getNumber() {
-  db.ref("queue").transaction(n => (n || 0) + 1)
-  .then(res => {
-    document.getElementById("your").innerText = "Số của bạn: " + res.snapshot.val();
-  })
-  .catch(err => alert(err));
+  const ref = db.ref("queue");
+
+  ref.transaction(current => {
+    return (current || 0) + 1;
+  }, (error, committed, snapshot) => {
+    if (error) {
+      alert("Lỗi: " + error);
+    } else if (committed) {
+      document.getElementById("your").innerText =
+        "Số của bạn: " + snapshot.val();
+    }
+  });
 }
 </script>
 
