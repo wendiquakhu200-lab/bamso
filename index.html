@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Queue</title>
+</head>
+
+<body style="text-align:center;margin-top:100px">
+
+<h2>🔔 Đang phục vụ</h2>
+<div id="current" style="font-size:50px;color:red">---</div>
+
+<br><br>
+
+<button onclick="getNumber()" style="font-size:25px">Lấy số</button>
+<h3 id="your">---</h3>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyD6vL7Nr8XhmCbX700FWcryO9wvoEfL3K8",
+  authDomain: "long-64d26.firebaseapp.com",
+  databaseURL: "https://long-64d26-default-rtdb.firebaseio.com"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+db.ref("current").on("value", snap => {
+  document.getElementById("current").innerText = snap.val() || "---";
+});
+
+function getNumber() {
+  db.ref("queue").transaction(n => (n || 0) + 1)
+  .then(res => {
+    document.getElementById("your").innerText = "Số của bạn: " + res.snapshot.val();
+  })
+  .catch(err => alert(err));
+}
+</script>
+
+</body>
+</html>
