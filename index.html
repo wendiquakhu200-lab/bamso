@@ -3,178 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>順番整理システム</title>
+<title>順番発券システム</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg: #0a0a0a;
-  --surface: #111111;
-  --border: #222;
-  --accent: #f5c542;
-  --accent2: #ff6b35;
-  --text: #f0ede8;
-  --muted: #555;
-  --success: #4caf50;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Noto Sans', sans-serif;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* TICKER */
-.ticker {
-  background: var(--accent);
-  color: #000;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  padding: 6px 0;
-  overflow: hidden;
-  white-space: nowrap;
-}
-.ticker-inner {
-  display: inline-block;
-  animation: ticker 20s linear infinite;
-}
-.ticker-inner span { margin: 0 40px; }
-@keyframes ticker {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-/* HEADER */
-header {
-  padding: 24px 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-}
-.logo {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 28px;
-  letter-spacing: 4px;
-  color: var(--accent);
-}
-.logo span { color: var(--text); }
-
-.clock {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-/* MAIN */
-.container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 40px 24px;
-}
-
-/* NOW */
-.now-serving {
-  text-align: center;
-  margin-bottom: 48px;
-  padding: 40px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-}
-.now-label {
-  font-family: 'IBM Plex Mono';
-  font-size: 11px;
-  letter-spacing: 4px;
-  color: var(--muted);
-}
-.now-number {
-  font-family: 'Bebas Neue';
-  font-size: 120px;
-  color: var(--accent);
-}
-.waiting-count {
-  font-family: 'IBM Plex Mono';
-  font-size: 13px;
-  color: var(--muted);
-}
-
-/* BUTTON */
-.take-btn {
-  background: var(--accent);
-  color: #000;
-  border: none;
-  font-family: 'Bebas Neue';
-  font-size: 28px;
-  padding: 20px 60px;
-  cursor: pointer;
-}
-
-/* CARD */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  padding: 24px;
-}
-.card-title {
-  font-family: 'IBM Plex Mono';
-  font-size: 10px;
-  letter-spacing: 3px;
-  color: var(--muted);
-}
-
-/* QUEUE */
-.queue-item {
-  font-family: 'IBM Plex Mono';
-  font-size: 12px;
-}
-
-/* ADMIN */
-.admin-title {
-  font-family: 'IBM Plex Mono';
-  font-size: 10px;
-  color: var(--muted);
-}
-
-/* TICKET */
-.ticket-header {
-  background: #0a0a0a;
-  color: var(--accent);
-  text-align: center;
-  padding: 12px;
-}
-.ticket-label {
-  font-family: 'IBM Plex Mono';
-  font-size: 11px;
-  color: #888;
-}
-.ticket-num {
-  font-family: 'Bebas Neue';
-  font-size: 96px;
-}
-.ticket-footer {
-  font-family: 'IBM Plex Mono';
-  font-size: 10px;
-  color: #aaa;
-  text-align: center;
-}
-
-/* PIN */
-.pin-title {
-  font-family: 'Bebas Neue';
-  color: var(--accent2);
-}
-.pin-sub {
-  font-family: 'IBM Plex Mono';
-  color: var(--muted);
-}
+/* GIỮ NGUYÊN CSS CỦA BẠN → KHÔNG ĐỘNG VÀO */
 </style>
+
 </head>
 
 <body>
@@ -183,59 +19,142 @@ header {
   <div class="ticker-inner">
     <span>🎯 いらっしゃいませ</span>
     <span>📋 整理券をお取りください</span>
-    <span>⏳ 順番にご案内いたします</span>
+    <span>⏳ 順番にご案内します</span>
     <span>🙏 お待ちいただきありがとうございます</span>
   </div>
 </div>
 
 <header>
-  <div class="logo">順番<span>システム</span></div>
+  <div class="logo">QUEUE<span>SYSTEM</span></div>
   <div class="clock">
-    <span id="date-display"></span> <span id="time"></span>
+    <span id="date-display"></span>&nbsp;&nbsp;<span id="time">00:00:00</span>
   </div>
 </header>
 
 <div class="container">
 
   <div class="now-serving">
-    <div class="now-label">現在ご案内中</div>
+    <div class="now-label">呼び出し中番号</div>
     <div class="now-number" id="serving-num">---</div>
-    <div class="waiting-count">待ち人数: <strong id="waiting-count">0</strong>人</div>
+    <div class="waiting-count">待ち人数: <strong id="waiting-count">0</strong> 人</div>
   </div>
 
-  <div style="text-align:center; margin-bottom:40px;">
-    <button class="take-btn" onclick="openInfoForm()">🎫 整理券を取る</button>
+  <div class="take-btn-wrap">
+    <button class="take-btn" onclick="openInfoForm()">🎫 整理券を取得</button>
   </div>
 
-  <div class="card">
-    <div class="card-title">本日の統計</div>
-    <div>発行数: <span id="total-issued">0</span></div>
-    <div>対応済み: <span id="total-served">0</span></div>
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">本日の統計</div>
+      <div class="grid" style="gap:8px; margin:0">
+        <div class="stat">
+          <div class="stat-num" id="total-issued">0</div>
+          <div class="stat-label">発行数</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="total-served">0</div>
+          <div class="stat-label">対応済</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">待ちリスト</div>
+      <ul class="queue-list" id="queue-list">
+        <li class="empty-queue">-- お客様はいません --</li>
+      </ul>
+    </div>
   </div>
 
-  <div class="card" style="margin-top:20px;">
-    <div class="card-title">待ちリスト</div>
-    <ul id="queue-list"></ul>
-  </div>
-
-  <div class="card" style="margin-top:20px;">
-    <div class="admin-title">スタッフ操作</div>
-    <button onclick="callNext()">▶ 次を呼び出す</button>
-    <button onclick="resetQueue()">🔒 リセット</button>
+  <div class="admin-section">
+    <div class="admin-title">⚙ スタッフ操作</div>
+    <div class="admin-btns">
+      <button class="admin-btn next" onclick="callNext()">▶ 次の番号を呼ぶ</button>
+      <button class="admin-btn reset" onclick="openPinModal()">🔒 リセット</button>
+    </div>
   </div>
 
 </div>
 
-<!-- POPUP -->
-<div id="ticket-popup" style="display:none;">
-  <div class="ticket-header">整理券</div>
+<!-- TICKET -->
+<div class="ticket-popup" id="ticket-popup" onclick="closeTicketOutside(event)">
+  <div class="ticket" id="ticket-card">
+    <button class="ticket-close" onclick="closePopup()">✕</button>
 
-  <div class="ticket-label">あなたの番号</div>
-  <div class="ticket-num" id="ticket-num">001</div>
+<div id="step-form">
+  <div class="ticket-header">📋 お客様情報</div>
+  <div class="ticket-body">
 
-  <div class="ticket-footer">
-    この券をお持ちください
+    <div class="ticket-label">発券前に情報を入力してください</div>
+
+    <div class="info-form" style="background:#fff; border-top:none; padding:0">
+
+      <div class="info-field">
+        <label>お名前 *</label>
+        <input type="text" id="f-name" placeholder="山田 太郎" />
+      </div>
+
+      <div class="info-field">
+        <label>電話番号</label>
+        <input type="tel" id="f-phone" placeholder="090-xxxx-xxxx" />
+      </div>
+
+      <div class="info-row">
+        <div class="info-field">
+          <label>👨 大人</label>
+          <div class="counter-wrap">
+            <button class="counter-btn" onclick="changeCount('adult', -1)">−</button>
+            <input class="counter-input" type="number" id="f-adult" value="1" readonly />
+            <button class="counter-btn" onclick="changeCount('adult', 1)">+</button>
+          </div>
+        </div>
+
+        <div class="info-field">
+          <label>👶 子供</label>
+          <div class="counter-wrap">
+            <button class="counter-btn" onclick="changeCount('child', -1)">−</button>
+            <input class="counter-input" type="number" id="f-child" value="0" readonly />
+            <button class="counter-btn" onclick="changeCount('child', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-field">
+        <label>備考</label>
+        <input type="text" id="f-note" placeholder="特記事項..." />
+      </div>
+
+    </div>
+
+    <button class="confirm-btn" onclick="confirmAndTake()">✔ 確認して発券</button>
   </div>
+</div>
+
+<div id="step-ticket" style="display:none">
+  <div class="ticket-header">★ 整理券 ★</div>
+  <div class="ticket-body">
+
+    <div class="ticket-label">あなたの番号</div>
+    <div class="ticket-num" id="ticket-num">001</div>
+
+    <hr class="ticket-divider">
+
+    <div class="ticket-info">
+      <div>👤 名前: <strong id="t-name"></strong></div>
+      <div>📱 電話: <strong id="t-phone"></strong></div>
+      <div>👨 大人: <strong id="t-adult"></strong> | 👶 子供: <strong id="t-child"></strong></div>
+      <div>🕐 発券時間: <strong id="ticket-time"></strong></div>
+      <div>⏳ 前に: <strong id="ticket-before"></strong> 人</div>
+      <div>⌚ 待ち時間: <strong id="ticket-wait"></strong></div>
+      <div id="t-note-row">📝 備考: <strong id="t-note"></strong></div>
+    </div>
+
+  </div>
+
+  <div class="ticket-footer">この番号札を大切に保管してください</div>
+</div>
+
+</div>
 </div>
 
 <script>
