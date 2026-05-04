@@ -1,170 +1,286 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hệ Thống Lấy Số / 整理券</title>
+<title>順番発券システム</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg:#0a0a0a;
-  --surface:#111;
-  --border:#222;
-  --accent:#f5c542;
-  --accent2:#ff6b35;
-  --text:#f0ede8;
-  --muted:#666;
-}
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222;
+    --accent: #f5c542;
+    --accent2: #ff6b35;
+    --text: #f0ede8;
+    --muted: #555;
+    --success: #4caf50;
+  }
 
-*{margin:0;padding:0;box-sizing:border-box}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body{
-  background:var(--bg);
-  color:var(--text);
-  font-family:Noto Sans;
-}
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-header{
-  padding:20px;
-  border-bottom:1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-}
+  .ticker {
+    background: var(--accent);
+    color: #000;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 6px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 
-.logo{
-  color:var(--accent);
-  font-family:Bebas Neue;
-  font-size:26px;
-}
+  .ticker-inner {
+    display: inline-block;
+    animation: ticker 20s linear infinite;
+  }
 
-.container{
-  max-width:900px;
-  margin:auto;
-  padding:20px;
-  text-align:center;
-}
+  .ticker-inner span { margin: 0 40px; }
 
-/* NOW */
-.now{
-  padding:30px;
-  border:1px solid var(--border);
-  background:var(--surface);
-  margin:20px 0;
-}
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
 
-.now-number{
-  font-size:100px;
-  color:var(--accent);
-  font-family:Bebas Neue;
-}
+  header {
+    padding: 24px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
 
-/* BUTTON */
-button{
-  padding:18px 50px;
-  font-size:22px;
-  background:var(--accent);
-  border:none;
-  cursor:pointer;
-  margin:10px;
-  font-family:Bebas Neue;
-}
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--accent);
+  }
 
-button:hover{
-  background:var(--accent2);
-}
+  .logo span { color: var(--text); }
 
-/* QUEUE */
-.list{
-  margin-top:20px;
-  text-align:left;
-}
+  .clock {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+  }
 
-.item{
-  padding:10px;
-  border-bottom:1px solid #333;
-  display:flex;
-  justify-content:space-between;
-  font-family:IBM Plex Mono;
-}
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
 
-.ja{
-  font-size:12px;
-  color:#aaa;
-}
+  .now-serving {
+    text-align: center;
+    padding: 40px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .now-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+  }
+
+  .now-number {
+    font-size: 120px;
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--accent);
+  }
+
+  .take-btn {
+    background: var(--accent);
+    color: #000;
+    font-size: 24px;
+    padding: 18px 50px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  .card-title {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .queue-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .q-num {
+    color: var(--accent);
+    font-family: 'Bebas Neue';
+    font-size: 20px;
+  }
+
+  .q-status.waiting { color: var(--muted); }
+  .q-status.serving { color: var(--accent2); }
+
+  .ticket-popup {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ticket-popup.show { display: flex; }
+
+  .ticket {
+    background: #fff;
+    color: #000;
+    width: 320px;
+    padding: 20px;
+  }
+
+  .ticket-header {
+    text-align: center;
+    font-family: 'Bebas Neue';
+    background: #000;
+    color: var(--accent);
+    padding: 10px;
+  }
+
+  .ticket-num {
+    font-size: 90px;
+    text-align: center;
+  }
+
+  .ticket-info {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .notify {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #111;
+    border-left: 4px solid var(--accent);
+    padding: 12px;
+    display: none;
+  }
+
+  .notify.show { display: block; }
 </style>
 </head>
 
 <body>
 
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>🎌 いらっしゃいませ</span>
+    <span>📋 整理券をお取りください</span>
+    <span>⏳ 順番にご案内いたします</span>
+    <span>🙏 お待ちいただきありがとうございます</span>
+  </div>
+</div>
+
 <header>
-  <div class="logo">QUEUE SYSTEM / 整理券</div>
+  <div class="logo">QUEUE<span>SYSTEM</span></div>
+  <div class="clock"><span id="time"></span></div>
 </header>
 
 <div class="container">
 
-  <div class="now">
-    <div>現在呼び出し / Đang gọi</div>
-    <div class="now-number" id="current">---</div>
+  <div class="now-serving">
+    <div class="now-label">現在の呼び出し番号</div>
+    <div class="now-number" id="serving-num">---</div>
   </div>
 
-  <button id="takeBtn">🎫 LẤY SỐ / 番号取得</button>
-  <button id="nextBtn">▶ GỌI TIẾP / 次呼ぶ</button>
+  <div style="text-align:center; margin:20px 0;">
+    <button class="take-btn" onclick="takeNumber()">番号を取得</button>
+  </div>
 
-  <div class="ja">待っている人数 / Số người chờ: <span id="waiting">0</span></div>
-
-  <div class="list" id="list"></div>
+  <div class="card">
+    <div class="card-title">待ちリスト</div>
+    <div id="queue"></div>
+  </div>
 
 </div>
 
+<div class="ticket-popup" id="ticket">
+  <div class="ticket">
+    <div class="ticket-header">整理券</div>
+    <div class="ticket-num" id="ticket-num">001</div>
+    <div class="ticket-info">
+      時間: <span id="t-time"></span><br>
+      待ち人数: <span id="t-wait"></span>
+    </div>
+  </div>
+</div>
+
+<div class="notify" id="notify"></div>
+
 <script>
 let queue = [];
-let current = null;
 let next = 1;
+let current = null;
 
-/* FIX: bắt buộc global cho GitHub Pages */
-window.takeNumber = takeNumber;
-window.callNext = callNext;
+function time() {
+  const d = new Date();
+  return d.getHours()+":"+String(d.getMinutes()).padStart(2,'0');
+}
 
-/* lấy số */
-document.getElementById("takeBtn").addEventListener("click", takeNumber);
+function update() {
+  document.getElementById("serving-num").innerText = current ?? "---";
 
-function takeNumber(){
-  queue.push(next++);
+  document.getElementById("queue").innerHTML =
+    queue.map(q =>
+      `<div class="queue-item">
+        <span class="q-num">${q.num}</span>
+        <span class="q-status ${q.status}">
+          ${q.status=="waiting"?"待機中":"呼出中"}
+        </span>
+      </div>`
+    ).join("");
+}
+
+function takeNumber() {
+  const num = next++;
+  queue.push({num, status:"waiting"});
+  document.getElementById("ticket-num").innerText = num;
+  document.getElementById("t-time").innerText = time();
+  document.getElementById("t-wait").innerText = queue.length;
+  document.getElementById("ticket").classList.add("show");
   update();
 }
 
-/* gọi số */
-document.getElementById("nextBtn").addEventListener("click", callNext);
+setInterval(()=>{
+  const d=new Date();
+  document.getElementById("time").innerText =
+    d.getHours()+":"+String(d.getMinutes()).padStart(2,'0')+":"+String(d.getSeconds()).padStart(2,'0');
+},1000);
 
-function callNext(){
-  if(queue.length === 0){
-    alert("Không còn ai / 誰もいません");
-    return;
-  }
-
-  current = queue.shift();
-  document.getElementById("current").innerText = current;
-  update();
-}
-
-/* UI update */
-function update(){
-  document.getElementById("waiting").innerText = queue.length;
-
-  let html = "";
-  queue.forEach((n,i)=>{
-    html += `
-      <div class="item">
-        <span>#${n}</span>
-        <span class="ja">待ち</span>
-      </div>
-    `;
-  });
-
-  document.getElementById("list").innerHTML = html;
-}
+update();
 </script>
 
 </body>
