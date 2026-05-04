@@ -28,24 +28,26 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-/* Hiển thị số đang phục vụ realtime */
+/* Hiện số đang phục vụ */
 db.ref("current").on("value", snap => {
   document.getElementById("current").innerText = snap.val() ?? "---";
 });
 
-/* Lấy số */
+/* Lấy số (BẢN ĐƠN GIẢN) */
 function getNumber() {
   const ref = db.ref("queue");
 
-  ref.transaction(current => {
-    return (current || 0) + 1;
-  }, (error, committed, snapshot) => {
-    if (error) {
-      alert("Lỗi: " + error);
-    } else if (committed) {
-      document.getElementById("your").innerText =
-        "Số của bạn: " + snapshot.val();
-    }
+  ref.once("value").then(snap => {
+    let current = snap.val() || 0;
+    let newNumber = current + 1;
+
+    ref.set(newNumber);
+
+    document.getElementById("your").innerText =
+      "Số của bạn: " + newNumber;
+  }).catch(err => {
+    console.log(err);
+    alert("Lỗi Firebase");
   });
 }
 </script>
