@@ -181,7 +181,7 @@ padding: 16px 22px; display: flex; align-items: center; justify-content: space-b
 .field-input.err { border-color: var(–red); box-shadow: 0 0 0 3px var(–red-dim); animation: shake 0.28s ease; }
 @keyframes shake { 0%,100%{transform:none;} 30%{transform:translateX(-5px);} 70%{transform:translateX(5px);} }
 
-/* COUNT — bug-free: span label + div display, no input, no label wrap */
+/* COUNT */
 .count-row { display: flex; gap: 12px; margin-bottom: 15px; }
 .count-box { flex: 1; }
 .count-box-label { display: block; font-size: 10px; letter-spacing: 3px; color: var(–ink-dim); margin-bottom: 7px; font-weight: 300; }
@@ -190,7 +190,7 @@ padding: 16px 22px; display: flex; align-items: center; justify-content: space-b
 width: 44px; background: transparent; border: none; color: var(–ink-mid);
 font-size: 22px; cursor: pointer; display: grid; place-items: center;
 transition: background 0.15s, color 0.15s; flex-shrink: 0; line-height: 1;
--webkit-tap-highlight-color: transparent; user-select: none; type: button;
+-webkit-tap-highlight-color: transparent; user-select: none;
 }
 .count-minus:hover, .count-plus:hover { background: var(–border); color: var(–red); }
 .count-minus:active, .count-plus:active { background: var(–red-dim); }
