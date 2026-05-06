@@ -463,19 +463,24 @@ function openForm(){
 }
 function closeTicket(){$('overlay-ticket').classList.remove('open');}
 
-$('btn-confirm').addEventListener('click',()=>{
-  const name=$('f-name').value.trim();
-  if(!name){
+$('btn-confirm').addEventListener('click', async () => {
+  const name = $('f-name').value.trim();
+
+  if (!name) {
     $('f-name').classList.add('err');
     $('f-name').focus();
-    setTimeout(()=>$('f-name').classList.remove('err'),1500);
+    setTimeout(() => $('f-name').classList.remove('err'), 1500);
     return;
   }
 
-  const phone=$('f-phone').value.trim(),note=$('f-note').value.trim();
-  const t=nowTime(),before=queue.filter(q=>q.status==='waiting').length,num=nextNum++;
+  const phone = $('f-phone').value.trim();
+  const note  = $('f-note').value.trim();
 
-  // 👉 DATA IN
+  const t = nowTime();
+  const before = queue.filter(q => q.status === 'waiting').length;
+
+  const num = nextNum; // ❗ chưa tăng
+
   const ticketData = {
     num: p3(num),
     name,
@@ -484,42 +489,59 @@ $('btn-confirm').addEventListener('click',()=>{
     time: t
   };
 
-  queue.push({num,status:'waiting',time:t,name,phone,adult:adultCnt,child:childCnt,note});
-  render();
+  // 🔒 chống spam click
+  $('btn-confirm').disabled = true;
 
-  // 👉 IN Ở ĐÂY
-printTicket(ticketData)
-  .catch(err => {
+  try {
+    // 👉 IN TRƯỚC
+    await printTicket(ticketData);
+
+    // 👉 CHỈ khi in OK mới xử lý tiếp
+    nextNum++;
+
+    queue.push({
+      num,
+      status: 'waiting',
+      time: t,
+      name,
+      phone,
+      adult: adultCnt,
+      child: childCnt,
+      note
+    });
+
+    render();
+
+    // 👉 update UI
+    $('r-num').textContent = p3(num);
+    $('r-name').textContent = name;
+    $('r-phone').textContent = phone || '—';
+    $('r-pax').textContent = `大人${adultCnt}名 · 子ども${childCnt}名`;
+    $('r-time').textContent = t;
+    $('r-before').textContent = `${before}名`;
+    $('r-est').textContent = before > 0 ? `約${before * 5}分` : 'まもなく';
+
+    if (note) {
+      $('r-note-k').style.display = '';
+      $('r-note-v').style.display = '';
+      $('r-note-v').textContent = note;
+    } else {
+      $('r-note-k').style.display = 'none';
+      $('r-note-v').style.display = 'none';
+    }
+
+    $('step-form').style.display = 'none';
+    $('step-result').style.display = 'block';
+
+    setTimeout(() => closeTicket(), 1500);
+
+  } catch (err) {
     console.error(err);
     toast('Lỗi in', 'Không thể in phiếu');
-  })
-  .finally(() => {
-    setTimeout(() => {
-      closeTicket();
-    }, 1500);
-  });
-  // phần hiển thị giữ nguyên
-  $('r-num').textContent=p3(num);
-  $('r-name').textContent=name;
-  $('r-phone').textContent=phone||'—';
-  $('r-pax').textContent=`大人${adultCnt}名 · 子ども${childCnt}名`;
-  $('r-time').textContent=t;
-  $('r-before').textContent=`${before}名`;
-  $('r-est').textContent=before>0?`約${before*5}分`:'まもなく';
-
-  if(note){
-    $('r-note-k').style.display='';
-    $('r-note-v').style.display='';
-    $('r-note-v').textContent=note;
-  }else{
-    $('r-note-k').style.display='none';
-    $('r-note-v').style.display='none';
+  } finally {
+    $('btn-confirm').disabled = false;
   }
-
-  $('step-form').style.display='none';
-  $('step-result').style.display='block';
 });
-
 $('btn-next').addEventListener('click',()=>{
   const next=queue.find(q=>q.status==='waiting');
   if(!next){toast('お知らせ','現在お待ちの方はいらっしゃいません。');return;}
@@ -583,24 +605,58 @@ function initQZ() {
 initQZ();
 function printTicket(data) {
   if (!qzReady) {
-    console.error("❌ QZ chưa kết nối");
     alert("QZ chưa kết nối!");
     return Promise.reject("QZ not ready");
   }
 
-  const config = qz.configs.create("Microsoft Print to PDF");
+  const config = qz.configs.create("EPSON TM-T20"); // nhớ đổi máy in
 
+  // 👇 THAY ĐOẠN NÀY
   const html = `
-    <div style="font-family: monospace; text-align:center;">
-      <h2>QUEUE TICKET</h2>
-      <h1>${data.num}</h1>
-      <hr/>
-      <p>名前: ${data.name}</p>
-      <p>人数: 大人${data.adult} 子${data.child}</p>
-      <p>時刻: ${data.time}</p>
-      <br/>
-      <p>お待ちください</p>
+  <div style="
+    font-family: monospace;
+    width: 220px;
+    text-align: center;
+    line-height: 1.4;
+  ">
+
+    <div style="font-size:14px;">
+      QUEUE TICKET
     </div>
+
+    <div style="
+      font-size:40px;
+      font-weight:bold;
+      margin:10px 0;
+    ">
+      ${data.num}
+    </div>
+
+    <div>--------------------</div>
+
+    <div style="text-align:left; font-size:12px;">
+      名前: ${data.name}
+    </div>
+
+    <div style="text-align:left; font-size:12px;">
+      人数: 大人${data.adult} 子${data.child}
+    </div>
+
+    <div style="text-align:left; font-size:12px;">
+      時刻: ${data.time}
+    </div>
+
+    <div style="margin-top:10px;">
+      お待ちください
+    </div>
+
+    <div style="margin-top:20px;">
+      --------------------
+    </div>
+
+    <div>\n\n\n\n</div>
+
+  </div>
   `;
 
   return qz.print(config, [{
