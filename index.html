@@ -494,7 +494,7 @@ $('btn-confirm').addEventListener('click', async () => {
 
   try {
     // 👉 IN TRƯỚC
-    await printTicket(ticketData);
+  await printTicket(ticketData);
 
     // 👉 CHỈ khi in OK mới xử lý tiếp
     nextNum++;
@@ -602,7 +602,13 @@ function initQZ() {
 }
 
 // gọi khi load web
-initQZ();
+function isPC() {
+  return !/Android|iPhone|iPad/i.test(navigator.userAgent);
+}
+
+if (isPC()) {
+  initQZ();
+}
 function printTicket(data) {
   if (!qzReady) {
     alert("QZ chưa kết nối!");
@@ -664,6 +670,23 @@ function printTicket(data) {
     format: 'plain',
     data: html
   }]);
+}
+
+if (isPC()) {
+  setInterval(async () => {
+    try {
+      const res = await fetch("http://150.249.1.90:3000/get"); // ⚠️ đổi localhost -> IP server
+      const data = await res.json();
+
+      if (data) {
+        console.log("🖨 In:", data);
+        await printTicket(data);
+      }
+
+    } catch (e) {
+      console.log("Polling error:", e);
+    }
+  }, 1000);
 }
 </script>
 
