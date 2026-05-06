@@ -488,16 +488,15 @@ $('btn-confirm').addEventListener('click',()=>{
   render();
 
   // 👉 IN Ở ĐÂY
- printTicket(ticketData)
-  .then(() => {
-    // 👉 in xong thì đóng popup
-    setTimeout(() => {
-      closeTicket();
-    }, 1500); // delay 1.5s cho user nhìn số
-  })
+printTicket(ticketData)
   .catch(err => {
     console.error(err);
     toast('Lỗi in', 'Không thể in phiếu');
+  })
+  .finally(() => {
+    setTimeout(() => {
+      closeTicket();
+    }, 1500);
   });
   // phần hiển thị giữ nguyên
   $('r-num').textContent=p3(num);
